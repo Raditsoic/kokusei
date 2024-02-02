@@ -15,7 +15,6 @@ class Modular(commands.Cog):
         print("Commands Available")
         await print(f'{username} is now online')
         
-        
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         default_prefix = '!'
@@ -24,6 +23,10 @@ class Modular(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         await self.db.remove_prefix(guild.id)
+        
+    @commands.Cog.listener()
+    async def on_member_join(self, ctx, member: discord.Member):
+        await ctx.send(f"Konnichiwa {member.mention}!! Welcome to {ctx.guild.name}")
 
 async def setup(client):
     await client.add_cog(Modular(client))

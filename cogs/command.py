@@ -24,6 +24,7 @@ class Command(commands.Cog):
             await self.client.close()
             
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, *, new_prefix):
         self.db.set_prefix(ctx.guild.id, new_prefix)
         await ctx.send(f"Prefix has successfully been set to: {new_prefix}")
@@ -55,10 +56,38 @@ class Command(commands.Cog):
         await ctx.send(f"{member.name} has been kicked for {reason}.")
         
     @commands.command()
-    @commands.has_permissions(ban_member=True)
+    @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, reason):
         await ctx.guild.ban(member)
         await ctx.send(f"{member.name} has been banned for {reason}.")
+        
+    @kick.error
+    async def kick_error(self, ctx, error):
+        if isinstance(error, commands.MissingFlagArgument):
+            await ctx.send(f"Usage: !kick <member>")
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send(f"You don't have the permission to kick member(s).")
+            
+    @ban.error
+    async def ban_error(self, ctx, error):
+        if isinstance(error, commands.MissingFlagArgument):
+            await ctx.send(f"Usage: !ban <member>")
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send(f"You don't have the permission to ban member(s).")
+            
+    @clear.error
+    async def clear_error(self, ctx, error):
+        if isinstance(error, commands.MissingFlagArgument):
+            await ctx.send(f"Usage: !clear <messageCount>")
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send(f"You don't have the permission to clear messages")
+            
+    @setprefix.error
+    async def setprefix_error(self, ctx, error):
+        if isinstance(error, commands.MissingFlagArgument):
+            await ctx.send(f"Usage: !setprefix <newprefix>")
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send(f"You don't have the permission to set new prefix")
         
 async def setup(client):
     await client.add_cog(Command(client))
