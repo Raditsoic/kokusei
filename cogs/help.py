@@ -9,6 +9,7 @@ class Help(commands.Cog):
     async def help(self, ctx):
         embed = discord.Embed(title="Help", description="All commands:", color=discord.Color.random(), timestamp=ctx.message.created_at)
         embed.set_author(name=ctx.bot.user.name, icon_url=ctx.bot.user.avatar)
+        embed.add_field(name="prefix", value=f"The currect prefix is {self.client.command_prefix(self.client, ctx.message)}")
         embed.add_field(name="ping", value=f"Pings {ctx.bot.user.name}", inline=False)
         embed.add_field(name="setprefix", value=f"Sets a new command prefix to this server. **!setprefix <newprefix>**", inline=False)
         embed.add_field(name="userinfo", value="Get member details by ID or mention. **!who/!whois/!userinfo <member>**", inline=False)

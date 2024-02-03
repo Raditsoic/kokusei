@@ -107,7 +107,7 @@ func main() {
 		}
 
 		id := c.Params("id")
-		filter := bson.M{"_id": id}
+		filter := bson.M{"id": id}
 		update := bson.M{"$set": updated_guild}
 		_, err := collection.UpdateOne(context.Background(), filter, update)
 		if err != nil {

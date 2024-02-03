@@ -1,14 +1,25 @@
 from discord.ext import commands
 from dotenv import load_dotenv
-from database import Database
 import discord
 import os
+import requests
+
+async def get_server_prefix(bot, message):
+    api_url = f'http://localhost:3000/guild/{str(message.guild.id)}'
+
+    try:
+        response = await requests.get(api_url)
+        response.raise_for_status()
+
+        data = response.json()
+        guild_prefix = data.get("prefix", "!")
+        return guild_prefix
+    except requests.RequestException as e:
+        print(f"Error: error in getting prefix, {e}")
 
 class Command(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.db = Database()
-        self.bot_name = os.getenv('BOT_NAME')
         load_dotenv()
         
     @commands.command()
@@ -24,10 +35,31 @@ class Command(commands.Cog):
             await self.client.close()
             
     @commands.command()
+    async def prefix(self, ctx):
+        await ctx.send(self.client.command_prefix)
+            
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, *, new_prefix):
-        self.db.set_prefix(ctx.guild.id, new_prefix)
+        api_url = f'http://localhost:3000/guild/{ctx.guild.id}'
+
+        new_data = {
+            "id": str(ctx.guild.id),
+            "name": str(ctx.guild.name),
+            "prefix": new_prefix
+        }
+        
+        try:
+            response = requests.put(api_url, json=new_data)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            return await ctx.send(f"Error: in setting prefix, {e}")
+        
+        print("Tes1")
         await ctx.send(f"Prefix has successfully been set to: {new_prefix}")
+        print("tes12")
+        self.client.change_prefix(get_server_prefix)
+        
             
     @commands.command(aliases=['whois', 'who'])
     async def userinfo(self, ctx, member:  discord.Member=None):
@@ -40,7 +72,7 @@ class Command(commands.Cog):
         embed.add_field(name="Joined At", value=member.joined_at.strftime("%d %B %Y"))
         embed.add_field(name="Created At", value=member.created_at.strftime("%d %B %Y"), inline=True)
         embed.set_thumbnail(url=member.avatar)
-        embed.set_footer(text=f"Powered by {self.bot_name}")
+        embed.set_footer(text=f"Powered by {ctx.bot.user.name}")
         await ctx.send(embed=embed)
         
     @commands.command()

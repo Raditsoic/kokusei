@@ -1,12 +1,10 @@
 import discord
 from discord.ext import commands
-from database import Database
-import json
+import requests
 
 class Modular(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.db = Database()
         
     @commands.Cog.listener()
     async def on_ready(self):
@@ -18,11 +16,31 @@ class Modular(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         default_prefix = '!'
-        await self.db.set_prefix(guild.id, default_prefix)
+        api_url = 'http://localhost:3000/guild'
+        
+        data = {
+            "id": f"{guild.id}",
+            "name": f"{guild.name}",
+            "prefix": default_prefix
+        }
+        
+        try:
+            response = await requests.post(api_url, json=data)
+            response.raise_for_status()
+            print("Successfully POST guild data")
+        except requests.RequestException as e:
+            print("Error: Failed to POST guild data, {e}")
             
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        await self.db.remove_prefix(guild.id)
+        api_url = f"http://localhost:3000/guild/{guild.id}"
+        
+        try:
+            response = await requests.delete(api_url)
+            response.raise_for_status()
+            print("Successfully DELETE guild data")
+        except requests.RequestException as e:
+            print("Error: Failed to DELETE guild data, {e}")
         
     @commands.Cog.listener()
     async def on_member_join(self, ctx, member: discord.Member):
