@@ -22,10 +22,9 @@ class Command(commands.Cog):
         self.client = client
         load_dotenv()
         
-    @commands.command()
-    async def ping(self, ctx):
-        bot_latency = round(self.client.latency * 1000)
-        await ctx.send(f"Konnichiwa!! {bot_latency} ms.")
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Success: Commands Cog is active...")
         
     @commands.command()
     async def shutdown(self, ctx):
@@ -54,10 +53,7 @@ class Command(commands.Cog):
             response.raise_for_status()
         except requests.RequestException as e:
             return await ctx.send(f"Error: in setting prefix, {e}")
-        
-        print("Tes1")
         await ctx.send(f"Prefix has successfully been set to: {new_prefix}")
-        print("tes12")
         self.client.change_prefix(get_server_prefix)
         
             

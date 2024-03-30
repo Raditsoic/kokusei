@@ -8,10 +8,7 @@ class Modular(commands.Cog):
         
     @commands.Cog.listener()
     async def on_ready(self):
-        user = str(self.client.user)
-        username = user[:-5]
-        print("Commands Available")
-        await print(f'{username} is now online')
+        print("Success: Modular Cog is active...")
         
     @commands.Cog.listener()
     async def on_guild_join(self, guild):

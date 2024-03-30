@@ -5,6 +5,10 @@ class Help(commands.Cog):
     def __init__(self, client):
         self.client = client
         
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Success: Help Cogs is active...")
+        
     @commands.command()
     async def help(self, ctx):
         embed = discord.Embed(title="Help", description="All commands:", color=discord.Color.random(), timestamp=ctx.message.created_at)

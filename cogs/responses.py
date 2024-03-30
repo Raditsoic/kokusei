@@ -12,17 +12,29 @@ class Responses(commands.Cog):
         
     @commands.Cog.listener()
     async def on_ready(self):
-        await print("Responses Available")
+        await print("Success: Response Cog is active...")
         
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, ctx, message):
         bot_id = int(os.getenv('BOT_ID'))
         bot_name = os.getenv('BOT_NAME')
+        print(message)
         if message.author.id != bot_id or message.author.name != bot_name:
             #print(dir(message))
             #print(type(message))
-            #print(message)
+            print(message)
             #print(message.content)
+            content = message.content
+            bad_word = ['fuck', 'shit', 'bitch']
+            for word in bad_word:
+                if word in content:
+                    ctx.send("Don't use bad word plss!!!")
+                    
+    @commands.Cog.listener()
+    async def on_message(self, ctx, message):
+        bot_id = int(os.getenv('BOT_ID'))
+        bot_name = os.getenv('BOT_NAME')
+        if message.author.id != bot_id or message.author.name != bot_name:
             content = message.content
             
     @commands.command()
@@ -30,7 +42,6 @@ class Responses(commands.Cog):
         req = r.get("https://animechan.xyz/api/random")
         content = req.content.decode("utf-8")
         data = json.loads(content)
-        print(data)
         embed = discord.Embed(title="Quotes", timestamp=ctx.message.created_at, color=discord.Color.light_grey())
         embed.add_field(name="", value=f"{data['quote']} - **{data['character']}**")
         embed.set_footer(text="Powered by Animechan")

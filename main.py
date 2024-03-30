@@ -17,7 +17,7 @@ def get_prefix(bot: cex.Bot, message: discord.Message):
         guild_prefix = data.get("prefix", "!")
         return guild_prefix
     except requests.RequestException as e:
-        print(f"Error: Requesting Guild Prefix, {e}")
+        print(f"Error: Requesting Guild Prefix 404")
         return "!"
  
        
@@ -28,6 +28,11 @@ intents.message_content = True
 client = cex.Bot(command_prefix=get_prefix, intents=intents)
 
 client.remove_command("help")
+
+@client.event
+async def on_ready():
+    await client.tree.sync()
+    print("Booting up Kokusei...")
 
 async def load():
     for filename in os.listdir('./cogs'):
